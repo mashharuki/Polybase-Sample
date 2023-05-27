@@ -1,5 +1,6 @@
+import { Auth } from "@polybase/auth";
 import { Polybase } from "@polybase/client";
-import { PolybaseProvider, useDocument, usePolybase } from "@polybase/react";
+import { AuthProvider, PolybaseProvider, useAuth, useDocument, usePolybase } from "@polybase/react";
 import './App.css';
 import Spinner from './common/Spinner';
 import logo from './logo.svg';
@@ -10,6 +11,7 @@ const nameSpace = "sample-mashharuki4"
 const polybase = new Polybase({
   defaultNamespace: nameSpace,
 });
+const auth = new Auth();
 
 /**
  * App Component
@@ -18,12 +20,9 @@ const polybase = new Polybase({
 function App() {
   // Polybaseを使うための準備
   const polybase = usePolybase();
+  const { auth, state } = useAuth();
   // DBから情報を取得する。
-  const { 
-    data, 
-    error, 
-    loading 
-  } = useDocument(polybase.collection("City"));
+  const { data, error, loading } = useDocument(polybase.collection("City"));
 
   /**
    * DBの取得結果を表形式で出力
@@ -37,25 +36,34 @@ function App() {
 
   return (
     <div className="App">
-      {loading ? (
-        <Spinner/>
-      ) : (
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {listItems}
-        </header>
-      )}
+      <header className="App-header">
+        {loading ? (
+          <Spinner/>
+        ) : (
+          <>
+            {(state === null) ? (
+              <button onClick={() => auth.signIn()}>Sign In</button>
+            ) : (
+              <>
+                <img src={logo} className="App-logo" alt="logo" />
+                <p>
+                  Edit <code>src/App.js</code> and save to reload.
+                </p>
+                <button onClick={() => auth.signOut()}>Sign Out</button>
+                <a
+                  className="App-link"
+                  href="https://reactjs.org"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Learn React
+                </a>
+                {listItems}
+              </>
+            )}
+          </>
+        )}
+      </header>
     </div>
   );
 }
@@ -67,7 +75,9 @@ function App() {
 function Root() {
   return (
     <PolybaseProvider polybase={polybase}>
-      <App/>
+      <AuthProvider auth={auth} polybase={polybase}>
+        <App/>
+      </AuthProvider>
     </PolybaseProvider>
   );
 }

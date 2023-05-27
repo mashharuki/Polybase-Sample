@@ -1,5 +1,6 @@
 import { Polybase } from "@polybase/client";
 
+// DB用の名前
 const nameSpace = "sample-mashharuki4"
 
 const db = new Polybase({

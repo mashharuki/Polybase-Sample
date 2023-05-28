@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@polybase/client": "^0.6.0"
+    "@polybase/client": "^0.6.0",
+    "@polybase/util": "^0.6.0"
   }
 }
